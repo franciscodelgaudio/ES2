@@ -21,7 +21,7 @@ O projeto utiliza as seguintes tecnologias principais:
 * **Backend**: Construído em **Java Spring**, responsável pela lógica de negócios e API.
 * **Banco de Dados**: Utilizamos o postgreSQl
 * **Contêineres**: **Docker** e **Docker Compose** para orquestração e gerenciamento dos serviços.
-* **CI/CD**: Utilização de **GitHub Actions** para automação de *build* e *deploy*.
+* **CI/CD**: Utilização de **GitHub Actions** para automação de *build* e *deploy*. ---Ainda em andamento
 
 ## 🚀 Como Rodar
 
