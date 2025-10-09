@@ -28,4 +28,4 @@ O projeto utiliza as seguintes tecnologias principais:
 Basta ter o **Docker** e o **Docker Compose** instalados e executar:
 
 ```bash
-docker compose up --build
+docker compose up -d --build web
