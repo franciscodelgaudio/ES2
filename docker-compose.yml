@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: es2-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-es2}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"   # opcional expor
+    volumes:
+      - es2_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-es2}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  pgadmin:
+    image: dpage/pgadmin4:8
+    container_name: es2-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+
+  api:
+    build:
+      context: ./backend         # <- AQUI está o conserto do seu erro
+      dockerfile: Dockerfile
+    container_name: es2-api
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-es2}
+      DB_USER: ${POSTGRES_USER:-postgres}
+      DB_PASS: ${POSTGRES_PASSWORD:-postgres}
+      SERVER_PORT: 8080
+      # SPRING_PROFILES_ACTIVE: prod
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: es2-web
+    ports:
+      - "4200:80"   # acessa o front em http://localhost:4200
+    depends_on:
+      - api
+
+volumes:
+  es2_data:
