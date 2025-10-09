@@ -1,8 +1,6 @@
 name: Z Smoke
-
 on:
-  workflow_dispatch:  # habilita botão "Run workflow" na aba Actions
-
+  workflow_dispatch:
 jobs:
   ping:
     runs-on: self-hosted
