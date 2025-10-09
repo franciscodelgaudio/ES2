@@ -23,11 +23,13 @@ services:
       dockerfile: Dockerfile
     image: es2-api:local
     restart: unless-stopped
-    environment:
-      DB_URL: jdbc:postgresql://db:5432/es2
-      DB_USER: equipe4              # <- CASANDO com o serviço db
-      DB_PASS: 1234                 # <- CASANDO com o serviço db
-      SERVER_PORT: 8080
+    # docker-compose.prod.yml (serviço api)
+environment:
+  SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/es2
+  SPRING_DATASOURCE_USERNAME: equipe4
+  SPRING_DATASOURCE_PASSWORD: 1234
+  SERVER_PORT: 8080
+
     depends_on:
       db:
         condition: service_healthy

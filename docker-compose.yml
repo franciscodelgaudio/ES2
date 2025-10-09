@@ -1,15 +1,18 @@
-version: "3.9"
+# (remova a linha "version", é obsoleta)
 
 services:
   db:
     image: postgres:16
     container_name: es2-db
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-es2}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: es2
+      POSTGRES_USER: equipe4
+      POSTGRES_PASSWORD: 1234
+      # Opcional: fixe o timezone do servidor Postgres (ou deixe sem para UTC)
+      # TZ: America/Sao_Paulo
     ports:
-      - "5432:5432"   # opcional expor
+      # se tiver Postgres no host, troque para 15432:5432
+      - "15432:5432"
     volumes:
       - es2_data:/var/lib/postgresql/data
     healthcheck:
@@ -31,13 +34,19 @@ services:
 
   api:
     build:
-      context: ./backend         # <- AQUI está o conserto do seu erro
+      context: ./backend
       dockerfile: Dockerfile
     container_name: es2-api
     environment:
-      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-es2}
-      DB_USER: ${POSTGRES_USER:-postgres}
-      DB_PASS: ${POSTGRES_PASSWORD:-postgres}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-es2}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-equipe4}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-1234}
+
+      # Evita o erro do Brazil/East; escolha UMA das linhas abaixo:
+      SPRING_JPA_PROPERTIES_HIBERNATE_JDBC_TIME_ZONE: UTC
+      # ou: SPRING_JPA_PROPERTIES_HIBERNATE_JDBC_TIME_ZONE: America/Sao_Paulo
+
+      # Porta exposta pelo Spring (opcional se já está 8080 por padrão)
       SERVER_PORT: 8080
       # SPRING_PROFILES_ACTIVE: prod
     ports:
@@ -45,16 +54,23 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    # (opcional) healthcheck simples:
+    # healthcheck:
+    #   test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
+    #   interval: 10s
+    #   timeout: 3s
+    #   retries: 10
+    #   start_period: 20s
 
   web:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: es2-web
-    ports:
-      - "4200:80"   # acessa o front em http://localhost:4200
     depends_on:
       - api
+    ports:
+      - "80:80"
 
 volumes:
   es2_data:
