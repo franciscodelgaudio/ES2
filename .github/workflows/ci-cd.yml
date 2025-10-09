@@ -53,8 +53,8 @@ jobs:
       - name: Lint (optional)
         run: npm run lint --if-present
 
-      - name: Run tests (optional)
-        run: npm test --if-present -- --watch=false
+      - name: Run tests (headless no CI)
+        run: npm test --if-present -- --watch=false --browsers=ChromeHeadless
 
       - name: Build production
         run: npm run build -- --configuration production
