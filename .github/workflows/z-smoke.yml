@@ -1,0 +1,11 @@
+name: Z Smoke
+
+on:
+  workflow_dispatch:  # habilita botão "Run workflow" na aba Actions
+
+jobs:
+  ping:
+    runs-on: self-hosted
+    steps:
+      - run: uname -a
+      - run: echo "Runner: ${{ runner.os }} / ${{ runner.arch }} / self-hosted"
