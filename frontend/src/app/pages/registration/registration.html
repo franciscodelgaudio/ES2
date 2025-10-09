@@ -1,0 +1,54 @@
+<div class="registration-container">
+  <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
+    <h1>Cadastro de Participante</h1>
+    <p class="subtitle">Crie sua conta para acessar os eventos</p>
+
+    <div class="form-group">
+      <label for="name">NOME COMPLETO</label>
+      <input id="name" type="text" formControlName="name">
+    </div>
+
+    <div class="form-group">
+      <label for="email">EMAIL</label>
+      <input id="email" type="email" formControlName="email">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="password">SENHA</label>
+        <input id="password" type="password" formControlName="password" placeholder="Mínimo 6 caracteres">
+      </div>
+      <div class="form-group">
+        <label for="confirmPassword">CONFIRME A SENHA</label>
+        <input id="confirmPassword" type="password" formControlName="confirmPassword">
+      </div>
+    </div>
+    <div *ngIf="registrationForm.errors?.['passwordMismatch'] && registrationForm.get('confirmPassword')?.dirty" class="error-message">
+      As senhas não coincidem.
+    </div>
+
+    <div class="form-group">
+      <label for="phoneParticipant">TELEFONE</label>
+      <input id="phoneParticipant" type="tel" formControlName="phoneParticipant">
+    </div>
+
+    <div class="form-group">
+      <label for="address">ENDEREÇO</label>
+      <input id="address" type="text" formControlName="address">
+    </div>
+
+    <div class="form-group">
+      <label for="roleParticipant">TIPO DE PESSOA</label>
+      <select id="roleParticipant" formControlName="roleParticipant">
+        <option [ngValue]="null" disabled>Selecione uma opção</option>
+        <option value="estudante">Estudante</option>
+        <option value="professor">Professor</option>
+        <option value="outro">Outro</option>
+      </select>
+    </div>
+
+    <div class="button-group">
+      <button type="submit" class="btn-primary" [disabled]="!registrationForm.valid">Finalizar cadastro</button>
+    </div>
+  </form>
+</div>
