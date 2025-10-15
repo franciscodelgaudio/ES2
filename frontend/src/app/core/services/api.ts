@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class ApiService {
   private http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8080/api'; 
+  private readonly apiUrl = 'http://localhost:8081/api'; 
 
   registerParticipant(userData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/participants`, userData);

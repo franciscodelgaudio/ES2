@@ -1,26 +1,31 @@
 <div class="login-container">
   <div class="login-box">
     <h1>Login</h1>
-    <p class="subtitle">Insira o seu e-mail e senha de cadastro</p>
+    <p class="subtitle">Insira seu e-mail. Você será redirecionado para o provedor de login.</p>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label for="email">EMAIL</label>
-        <input id="email" type="email" formControlName="email" placeholder="hello@reallygreatsite.com">
+        <input id="email" type="email" formControlName="email" placeholder="voce@exemplo.com">
       </div>
 
       <div class="form-group">
         <label for="password">SENHA</label>
+        <!-- Mantemos por compat/estética; não será usada localmente -->
         <input id="password" type="password" formControlName="password" placeholder="******">
       </div>
 
-      <button type="submit" class="btn-login" [disabled]="!loginForm.valid">log in</button>
+      <button type="submit" class="btn-login" [disabled]="!loginForm.valid">
+        Entrar
+      </button>
     </form>
+
+    <!-- Botão alternativo, caso queira pular validação do form -->
+    <!-- <button type="button" class="btn-login" (click)="loginDirect()">Entrar com Keycloak</button> -->
 
     <div class="registration-link">
       <span>Não tem uma conta? </span>
       <a routerLink="/registration">Cadastre-se</a>
     </div>
-
   </div>
 </div>
