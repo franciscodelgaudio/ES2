@@ -33,8 +33,8 @@ export class Registration implements OnInit {
       name: new FormControl('', Validators.required),
       email: new FormControl('', [Validators.required, Validators.email]),
       password: new FormControl('', [Validators.required, Validators.minLength(6)]),
-      confirmPassword: new FormControl('', Validators.required), 
-      phoneParticipant: new FormControl('', Validators.required),
+      confirmPassword: new FormControl('', [Validators.required, Validators.minLength(6)]), 
+      phoneParticipant: new FormControl('', [Validators.required, Validators.minLength(9), Validators.maxLength(9)]),
       roleParticipant: new FormControl(null, Validators.required),
       cep: new FormControl('', [Validators.required, Validators.minLength(8), Validators.maxLength(8)]),
       logradouro: new FormControl('', Validators.required),
@@ -58,10 +58,8 @@ export class Registration implements OnInit {
       }
     });
 
-    if (isStep1Valid) {
+    if (isStep1Valid && !this.registrationForm.hasError('passwordMismatch')) {
       this.currentStep.set(2);
-    } else {
-      alert('Por favor, preencha todos os dados pessoais corretamente.');
     }
   }
 
@@ -118,7 +116,8 @@ export class Registration implements OnInit {
         }
       });
     } else {
-      alert('Por favor, preencha todos os campos corretamente.');
+      // Força a exibição de todos os erros caso o formulário seja inválido
+      this.registrationForm.markAllAsTouched();
     }
   }
 }

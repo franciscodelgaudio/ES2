@@ -97,6 +97,11 @@ button {
 .error-message {
   color: #e53935;
   font-size: 0.8rem;
-  margin-top: -0.5rem;
+  margin-top: 0.4rem;
   margin-bottom: 1rem;
+}
+
+.required-asterisk {
+  color: #e53935;
+  margin-left: 10px;
 }

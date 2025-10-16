@@ -1,0 +1,32 @@
+<div class="lectures-container">
+  <h3 class="section-heading">Palestras do Evento</h3>
+  <div *ngFor="let lecture of lectures" class="lecture-card">
+    <div class="lecture-time">
+      <span>{{ lecture.startTime }}</span>
+      <span>-</span>
+      <span>{{ lecture.endTime }}</span>
+    </div>
+    <div class="lecture-details">
+      <div class="lecture-header">
+        <div>
+          <h4 class="lecture-title">{{ lecture.nameEventLecture }}</h4>
+          <p class="lecture-speaker">com {{ lecture.speaker }}</p>
+        </div>
+        <button 
+          class="subscription-button"
+          [class.subscribed]="lecture.isSubscribed"
+          (click)="toggleSubscription(lecture); $event.stopPropagation()">
+          {{ lecture.isSubscribed ? 'Inscrito ✓' : 'Inscrever-se' }}
+        </button>
+      </div>
+      
+      <div class="lecture-meta-info">
+        <span class="meta-item">📍 {{ lecture.address }}</span>
+        <span class="meta-item">👥 {{ lecture.quantityVacancies }} vagas</span>
+        <span class="meta-item">🗓️ {{ lecture.startDate | date: 'dd/MM/yyyy' }}</span>
+      </div>
+
+      <p class="lecture-description">{{ lecture.description }}</p>
+    </div>
+  </div>
+</div>

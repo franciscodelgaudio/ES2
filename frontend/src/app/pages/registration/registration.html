@@ -1,27 +1,47 @@
 <div class="registration-container">
   <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
     <h1>Cadastro de Participante</h1>
-    
+
+    <div class="subtitle" *ngIf="currentStep() === 1">
+      Etapa 1 de 2: Dados Pessoais
+    </div>
+    <div class="subtitle" *ngIf="currentStep() === 2">
+      Etapa 2 de 2: Endereço
+    </div>
     <div *ngIf="currentStep() === 1">
 
       <div class="form-group">
-        <label for="name">NOME COMPLETO</label>
+        <label for="name">NOME COMPLETO<span class="required-asterisk">*</span></label>
         <input id="name" type="text" formControlName="name">
+        <div *ngIf="registrationForm.get('name')?.invalid && registrationForm.get('name')?.touched" class="error-message">
+          <span *ngIf="registrationForm.get('name')?.hasError('required')">O nome completo é obrigatório.</span>
+        </div>
       </div>
 
       <div class="form-group">
-        <label for="email">EMAIL</label>
+        <label for="email">EMAIL<span class="required-asterisk">*</span></label>
         <input id="email" type="email" formControlName="email">
+        <div *ngIf="registrationForm.get('email')?.invalid && registrationForm.get('email')?.touched" class="error-message">
+          <span *ngIf="registrationForm.get('email')?.hasError('required')">O email é obrigatório.</span>
+          <span *ngIf="registrationForm.get('email')?.hasError('email')">Por favor, insira um email válido.</span>
+        </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="password">SENHA</label>
+          <label for="password">SENHA<span class="required-asterisk">*</span></label>
           <input id="password" type="password" formControlName="password" placeholder="Mínimo 6 caracteres">
+          <div *ngIf="registrationForm.get('password')?.invalid && registrationForm.get('password')?.touched" class="error-message">
+            <span *ngIf="registrationForm.get('password')?.hasError('required')">A senha é obrigatória.</span>
+            <span *ngIf="registrationForm.get('password')?.hasError('minlength')">A senha deve ter no mínimo 6 caracteres.</span>
+          </div>
         </div>
         <div class="form-group">
-          <label for="confirmPassword">CONFIRME A SENHA</label>
+          <label for="confirmPassword">CONFIRME A SENHA<span class="required-asterisk">*</span></label>
           <input id="confirmPassword" type="password" formControlName="confirmPassword">
+          <div *ngIf="registrationForm.get('confirmPassword')?.invalid && registrationForm.get('confirmPassword')?.touched" class="error-message">
+             <span *ngIf="registrationForm.get('confirmPassword')?.hasError('required')">A confirmação da senha é obrigatória.</span>
+          </div>
         </div>
       </div>
       <div *ngIf="registrationForm.errors?.['passwordMismatch'] && registrationForm.get('confirmPassword')?.dirty" class="error-message">
@@ -29,18 +49,25 @@
       </div>
 
       <div class="form-group">
-        <label for="phoneParticipant">TELEFONE</label>
+        <label for="phoneParticipant">TELEFONE<span class="required-asterisk">*</span></label>
         <input id="phoneParticipant" type="tel" formControlName="phoneParticipant">
+        <div *ngIf="registrationForm.get('phoneParticipant')?.invalid && registrationForm.get('phoneParticipant')?.touched" class="error-message">
+          <span *ngIf="registrationForm.get('phoneParticipant')?.hasError('required')">O telefone é obrigatório.</span>
+          <span *ngIf="registrationForm.get('phoneParticipant')?.hasError('minlength') || registrationForm.get('phoneParticipant')?.hasError('maxlength')">O telefone deve ter 9 dígitos.</span>
+        </div>
       </div>
 
       <div class="form-group">
-        <label for="roleParticipant">TIPO DE PESSOA</label>
+        <label for="roleParticipant">TIPO DE PESSOA<span class="required-asterisk">*</span></label>
         <select id="roleParticipant" formControlName="roleParticipant">
           <option [ngValue]="null" disabled>Selecione uma opção</option>
           <option value="estudante">Estudante</option>
           <option value="professor">Professor</option>
           <option value="outro">Outro</option>
         </select>
+        <div *ngIf="registrationForm.get('roleParticipant')?.invalid && registrationForm.get('roleParticipant')?.touched" class="error-message">
+          <span *ngIf="registrationForm.get('roleParticipant')?.hasError('required')">Selecione um tipo de pessoa.</span>
+        </div>
       </div>
 
       <div class="button-group">
@@ -51,34 +78,53 @@
     <div *ngIf="currentStep() === 2">
 
       <div class="form-group">
-        <label for="cep">CEP</label>
+        <label for="cep">CEP<span class="required-asterisk">*</span></label>
         <input id="cep" type="text" placeholder="Apenas números" formControlName="cep" (blur)="onCepBlur()">
+        <div *ngIf="registrationForm.get('cep')?.invalid && registrationForm.get('cep')?.touched" class="error-message">
+            <span *ngIf="registrationForm.get('cep')?.hasError('required')">O CEP é obrigatório.</span>
+            <span *ngIf="registrationForm.get('cep')?.hasError('minlength') || registrationForm.get('cep')?.hasError('maxlength')">O CEP deve ter 8 dígitos.</span>
+        </div>
       </div>
       
       <div class="form-group">
-          <label for="logradouro">LOGRADOURO (RUA)</label>
+          <label for="logradouro">LOGRADOURO (RUA)<span class="required-asterisk">*</span></label>
           <input id="logradouro" type="text" formControlName="logradouro">
+          <div *ngIf="registrationForm.get('logradouro')?.invalid && registrationForm.get('logradouro')?.touched" class="error-message">
+            <span *ngIf="registrationForm.get('logradouro')?.hasError('required')">O logradouro é obrigatório.</span>
+          </div>
       </div>
   
       <div class="form-row">
           <div class="form-group">
-              <label for="numero">NÚMERO</label>
+              <label for="numero">NÚMERO<span class="required-asterisk">*</span></label>
               <input id="numero" type="text" formControlName="numero">
+              <div *ngIf="registrationForm.get('numero')?.invalid && registrationForm.get('numero')?.touched" class="error-message">
+                <span *ngIf="registrationForm.get('numero')?.hasError('required')">O número é obrigatório.</span>
+              </div>
           </div>
           <div class="form-group">
-              <label for="bairro">BAIRRO</label>
+              <label for="bairro">BAIRRO<span class="required-asterisk">*</span></label>
               <input id="bairro" type="text" formControlName="bairro">
+              <div *ngIf="registrationForm.get('bairro')?.invalid && registrationForm.get('bairro')?.touched" class="error-message">
+                <span *ngIf="registrationForm.get('bairro')?.hasError('required')">O bairro é obrigatório.</span>
+              </div>
           </div>
       </div>
   
       <div class="form-row">
           <div class="form-group">
-              <label for="cidade">CIDADE</label>
+              <label for="cidade">CIDADE<span class="required-asterisk">*</span></label>
               <input id="cidade" type="text" formControlName="cidade">
+              <div *ngIf="registrationForm.get('cidade')?.invalid && registrationForm.get('cidade')?.touched" class="error-message">
+                <span *ngIf="registrationForm.get('cidade')?.hasError('required')">A cidade é obrigatória.</span>
+              </div>
           </div>
           <div class="form-group">
-              <label for="estado">ESTADO</label>
+              <label for="estado">ESTADO<span class="required-asterisk">*</span></label>
               <input id="estado" type="text" formControlName="estado">
+              <div *ngIf="registrationForm.get('estado')?.invalid && registrationForm.get('estado')?.touched" class="error-message">
+                <span *ngIf="registrationForm.get('estado')?.hasError('required')">O estado é obrigatório.</span>
+              </div>
           </div>
       </div>
   
