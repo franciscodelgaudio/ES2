@@ -8,9 +8,7 @@ import { MainEvent } from '../../pages/event/event'; // Ajuste o caminho se a su
 })
 export class ApiService {
   private http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8080/api';
-
-  // --- MÉTODOS EXISTENTES ---
+  private readonly apiUrl = 'http://localhost:8081/api';
 
   registerParticipant(userData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/participants`, userData);
@@ -19,6 +17,7 @@ export class ApiService {
   getAddressByCep(cep: string): Observable<any> {
     return this.http.get(`https://viacep.com.br/ws/${cep}/json/`);
   }
+
 
   // --- NOVOS MÉTODOS PARA EVENTOS E PALESTRAS ---
 

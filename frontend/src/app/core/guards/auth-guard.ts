@@ -1,5 +1,12 @@
-import { CanActivateFn } from '@angular/router';
+import { CanActivateFn, Router } from '@angular/router';
+import { inject } from '@angular/core';
+import { Auth } from '../services/auth';
 
-export const authGuard: CanActivateFn = (route, state) => {
-  return true;
+// src/app/core/guards/auth-guard.ts
+export const authGuard: CanActivateFn = () => {
+  const auth = inject(Auth);
+  if (auth.isLoggedIn()) return true;
+  auth.login(); // inicia o fluxo no OP
+  return false;
 };
+

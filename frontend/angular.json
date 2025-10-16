@@ -24,11 +24,7 @@
             "styles": [
               "src/styles.css"
             ],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "src/server.ts"
-            }
+            "outputPath": "dist/eventos-esii/browser"
           },
           "configurations": {
             "production": {
@@ -56,12 +52,15 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "buildTarget": "eventos-esii:build"
+          },
           "configurations": {
-            "production": {
-              "buildTarget": "eventos-esii:build:production"
-            },
             "development": {
               "buildTarget": "eventos-esii:build:development"
+            },
+            "production": {
+              "buildTarget": "eventos-esii:build:production"
             }
           },
           "defaultConfiguration": "development"
