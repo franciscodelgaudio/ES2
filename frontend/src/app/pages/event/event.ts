@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, NgZone, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventLectures } from '../event-lectures/event-lectures';
@@ -58,7 +58,12 @@ export class Event implements OnInit {
 
   isAdmin = false;
 
-  constructor(private auth: Auth, private oauth: OAuthService) { }
+  constructor(
+    private auth: Auth,
+    private oauth: OAuthService,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
+  ) { }
   isCreatingEvent: boolean = false;
   isCreatingLecture: boolean = false;
 
@@ -73,17 +78,23 @@ export class Event implements OnInit {
   ngOnInit(): void {
     this.updateIsAdmin();
 
-    // Recalcula quando o token chegar/renovar
+    // 1ª tentativa (útil se a API permitir público ou o token já existir)
+    this.loadEvents();
+
+    // Quando o token chegar ou renovar, recarregue
     this.oauth.events.subscribe((e: OAuthEvent) => {
       if (e.type === 'token_received' || e.type === 'token_refreshed') {
-        console.log('[EVENT] token event:', e.type);
-        this.updateIsAdmin();                   // 2ª checagem quando o token chega ou renova
+        this.updateIsAdmin();
+        this.loadEvents();
+        if (this.isAdmin) {
+          this.loadFormData();
+        }
       }
     });
 
-    this.loadEvents();
-    if (this.isAdmin) {
-      this.loadFormData();
+    // Se já houver token válido no refresh da página, não espere o evento
+    if ((this.oauth as any).hasValidAccessToken?.()) {
+      if (this.isAdmin) this.loadFormData();
     }
   }
 
@@ -107,11 +118,14 @@ export class Event implements OnInit {
   loadEvents(): void {
     this.apiService.getEvents().subscribe({
       next: (data) => {
-        this.events = data.map(event => ({
-          ...event,
-          imageUrl: 'assets/images/event.jpg',
-          lectures: event.lectures.map(lecture => ({ ...lecture, isSubscribed: false }))
-        }));
+        this.ngZone.run(() => {
+          this.events = (data ?? []).map(ev => ({
+            ...ev,
+            imageUrl: ev.imageUrl ?? 'assets/images/event.jpg',
+            lectures: (ev.lectures ?? []).map(l => ({ ...l, isSubscribed: false }))
+          }));
+          this.cdr.detectChanges(); // garante render imediato
+        });
       },
       error: (err) => console.error('Falha ao carregar eventos da API:', err)
     });
@@ -139,8 +153,8 @@ export class Event implements OnInit {
       startTime: '',
       endTime: '',
       description: '',
-      eventTypeId: null, 
-      eventManagerId: null 
+      eventTypeId: null,
+      eventManagerId: null
     };
   }
 
@@ -151,14 +165,14 @@ export class Event implements OnInit {
   saveNewEvent() {
     const eventPayload = {
       ...this.newEvent,
-      lectures: [] 
+      lectures: []
     };
 
     this.apiService.createEvent(eventPayload).subscribe({
       next: (newEvent) => {
         console.log('Evento criado com sucesso:', newEvent);
-        alert('Evento cadastrado com sucesso!'); 
-        this.loadEvents(); 
+        alert('Evento cadastrado com sucesso!');
+        this.loadEvents();
         this.closeCreateEventForm();
       },
       error: (err) => {
@@ -180,7 +194,7 @@ export class Event implements OnInit {
       startTime: '',
       endTime: '',
       description: '',
-      eventManagerId: null 
+      eventManagerId: null
     };
   }
 
@@ -191,11 +205,11 @@ export class Event implements OnInit {
   saveNewLecture() {
     if (this.selectedEvent) {
       const eventId = this.selectedEvent.eventId;
-      
+
       this.apiService.addLectureToEvent(eventId, this.newLecture).subscribe({
         next: (newLecture) => {
           console.log(`Palestra adicionada ao evento ${eventId}:`, newLecture);
-          alert('Palestra adicionada com sucesso!'); 
+          alert('Palestra adicionada com sucesso!');
           this.loadEvents();
           this.closeCreateLectureForm();
           this.closeDetails();

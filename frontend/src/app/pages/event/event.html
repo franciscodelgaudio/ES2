@@ -8,14 +8,14 @@
       + Cadastrar Evento
     </button>
   </div>
-
+  
   <div class="events-grid">
-    <div *ngFor="let event of events" class="event-card" (click)="showDetails(event)">
-      <img class="event-image" [src]="event.imageUrl" [alt]="event.nameEvent">
+    <div *ngFor="let evt of events" class="event-card" (click)="showDetails(evt)">
+      <img class="event-image" [src]="evt.imageUrl" [alt]="evt.nameEvent">
       <div class="event-info">
-        <h3 class="event-title">{{ event.nameEvent }}</h3>
-        <p class="event-date">{{ event.startDate | date: 'dd/MM/yyyy' }}</p>
-        <p class="event-description">{{ event.description }}</p>
+        <h3 class="event-title">{{ evt.nameEvent }}</h3>
+        <p class="event-date">{{ evt.startDate | date: 'dd/MM/yyyy' }}</p>
+        <p class="event-description">{{ evt.description }}</p>
       </div>
     </div>
   </div>
@@ -43,12 +43,11 @@
 
       <h3 class="section-heading">Sobre o Evento</h3>
       <p class="details-description">{{ selectedEvent.description }}</p>
-      
-      <app-event-lectures 
-        *ngIf="selectedEvent.lectures && selectedEvent.lectures.length > 0"
+
+      <app-event-lectures *ngIf="selectedEvent.lectures && selectedEvent.lectures.length > 0"
         [lectures]="selectedEvent.lectures">
       </app-event-lectures>
-      
+
       <button class="cta-button" (click)="subscribeToMainEvent()">
         Finalizar Inscrição no Evento
       </button>
@@ -122,7 +121,8 @@
       <form (ngSubmit)="saveNewLecture()">
         <div class="form-group">
           <label for="lectureName">Nome da Palestra</label>
-          <input type="text" id="lectureName" [(ngModel)]="newLecture.nameEventLecture" name="nameEventLecture" required>
+          <input type="text" id="lectureName" [(ngModel)]="newLecture.nameEventLecture" name="nameEventLecture"
+            required>
         </div>
         <div class="form-group">
           <label for="lectureSpeaker">Palestrante</label>
@@ -133,14 +133,14 @@
           <input type="text" id="lectureAddress" [(ngModel)]="newLecture.address" name="address">
         </div>
         <div class="form-group-row">
-            <div class="form-group">
-              <label for="lectureStartDate">Data de Início</label>
-              <input type="date" id="lectureStartDate" [(ngModel)]="newLecture.startDate" name="startDate">
-            </div>
-            <div class="form-group">
-              <label for="lectureEndDate">Data de Fim</label>
-              <input type="date" id="lectureEndDate" [(ngModel)]="newLecture.endDate" name="endDate">
-            </div>
+          <div class="form-group">
+            <label for="lectureStartDate">Data de Início</label>
+            <input type="date" id="lectureStartDate" [(ngModel)]="newLecture.startDate" name="startDate">
+          </div>
+          <div class="form-group">
+            <label for="lectureEndDate">Data de Fim</label>
+            <input type="date" id="lectureEndDate" [(ngModel)]="newLecture.endDate" name="endDate">
+          </div>
         </div>
         <div class="form-group-row">
           <div class="form-group">
@@ -155,7 +155,8 @@
         <div class="form-group-row">
           <div class="form-group">
             <label for="lectureVacancies">Nº de Vagas</label>
-            <input type="number" id="lectureVacancies" [(ngModel)]="newLecture.quantityVacancies" name="quantityVacancies">
+            <input type="number" id="lectureVacancies" [(ngModel)]="newLecture.quantityVacancies"
+              name="quantityVacancies">
           </div>
           <div class="form-group">
             <label for="lectureManager">Gerente Responsável</label>
