@@ -50,7 +50,10 @@ export const appConfig: ApplicationConfig = {
 
     importProvidersFrom(
       OAuthModule.forRoot({
-        resourceServer: { allowedUrls: ['/api'], sendAccessToken: true }
+        resourceServer: {
+          allowedUrls: ['http://localhost:8081/api'], // <— aqui!
+          sendAccessToken: true
+        }
       })
     ),
 
