@@ -7,13 +7,14 @@ import { Observable } from 'rxjs';
 })
 export class ApiService {
   private http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8081/api'; 
+  private readonly apiUrl = 'http://localhost:8081/api';
 
   registerParticipant(userData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/participants`, userData);
   }
 
-  getAddressByCep(cep: string): Observable<any> {
-    return this.http.get(`https://viacep.com.br/ws/${cep}/json/`);
+  getAddressByCep(cep: string) {
+    // antes: https://viacep.com.br/ws/${cep}/json/
+    return this.http.get<any>(`/viacep/ws/${cep}/json/`);
   }
 }

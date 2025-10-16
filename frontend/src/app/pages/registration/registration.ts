@@ -86,7 +86,7 @@ export class Registration implements OnInit {
         },
         error: (err) => {
           console.error('Erro ao buscar CEP:', err);
-          alert('Não foi possível consultar o CEP.');
+          alert('Não foi possível consultar o CEP.' + err);
         }
       });
     }

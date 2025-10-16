@@ -6,36 +6,35 @@ services:
       POSTGRES_DB: es2
       POSTGRES_USER: equipe4
       POSTGRES_PASSWORD: 1234
-    ports:
-      - "15432:5432"
+      # Opcional: timezone do container do DB (não resolve o erro do driver)
+      # TZ: UTC
+    ports: ["15432:5432"]
     volumes:
       - es2_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-es2}"]
+      # Dica: se quiser evitar a substituição por variáveis do host, fixa usuário/db
+      test: ["CMD-SHELL", "pg_isready -U equipe4 -d es2"]
       interval: 5s
       timeout: 3s
       retries: 20
 
-  pgadmin:
-    image: dpage/pgadmin4:8
-    container_name: es2-pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@local}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
-    ports:
-      - "5050:80"
-    depends_on:
-      - db
-
   keycloak:
-    image: quay.io/keycloak/keycloak:latest
+    image: quay.io/keycloak/keycloak:26.4.0
     container_name: es2-keycloak
-    command: ["start-dev"]
+    command: ["start-dev", "--import-realm"]
     environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-    ports:
-      - "8080:8080"
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_PROXY: edge
+      KC_SPI_THEME_CACHE_THEMES: "false"
+      KC_SPI_THEME_CACHE_TEMPLATES: "false"
+      # Opcional: só pra logs do container
+      # TZ: America/Sao_Paulo
+    ports: ["8080:8080"]
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+      - ./keycloak/realm-es2.json:/opt/keycloak/data/import/es2.json:ro
+      - ./keycloak/theme:/opt/keycloak/themes:ro
 
   api:
     build:
@@ -48,9 +47,12 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-1234}
       SPRING_JPA_PROPERTIES_HIBERNATE_JDBC_TIME_ZONE: UTC
       SERVER_PORT: 8081
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/es2
-    ports:
-      - "8081:8081"
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/es2/protocol/openid-connect/certs
+
+      # 👇 ADICIONE ESTAS DUAS LINHAS (resolve o "Brazil/East")
+      TZ: America/Sao_Paulo
+      JAVA_TOOL_OPTIONS: -Duser.timezone=America/Sao_Paulo
+    ports: ["8081:8081"]
     depends_on:
       db:
         condition: service_healthy
@@ -61,10 +63,9 @@ services:
     build:
       context: ./frontend
     container_name: es2-web
-    depends_on:
-      - api
-    ports:
-      - "80:80"
+    depends_on: [api]
+    ports: ["80:80"]
 
 volumes:
   es2_data:
+  keycloak_data:

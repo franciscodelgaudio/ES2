@@ -13,7 +13,7 @@ export function initAuth(oauth: OAuthService, platformId: Object) {
   return async () => {
     if (!isPlatformBrowser(platformId)) return;
 
-    const origin = 'http://localhost:4200'; // http://localhost
+    const origin = 'http://localhost/'; // http://localhost
     oauth.configure({ ...authCodeFlowConfig, redirectUri: origin });
 
     // 1) Descoberta do OP
@@ -37,11 +37,6 @@ export function initAuth(oauth: OAuthService, platformId: Object) {
         window.history.replaceState({}, document.title, origin);
       }
     });
-
-    // 4) Se ainda não logado, dispara o login
-    if (!oauth.hasValidAccessToken()) {
-      oauth.initCodeFlow();
-    }
   };
 }
 
@@ -55,10 +50,7 @@ export const appConfig: ApplicationConfig = {
 
     importProvidersFrom(
       OAuthModule.forRoot({
-        resourceServer: {
-          allowedUrls: ['http://localhost:8081/api'],
-          sendAccessToken: true,
-        },
+        resourceServer: { allowedUrls: ['/api'], sendAccessToken: true }
       })
     ),
 
