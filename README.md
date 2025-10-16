@@ -10,7 +10,6 @@ Este trabalho foi desenvolvido por:
 
 * **Francisco Delgaudio**
 * **Anny Karoline**
-* **Pedro G. Toscano**
 * **Bruna Luiza**
 
 ## 🛠️ Tecnologias Utilizadas
@@ -28,4 +27,4 @@ O projeto utiliza as seguintes tecnologias principais:
 Basta ter o **Docker** e o **Docker Compose** instalados e executar:
 
 ```bash
-docker compose up -d --build web
+docker compose up -d --build
