@@ -1,10 +1,12 @@
 package com.es2.equipe4.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;   
+import com.fasterxml.jackson.annotation.JsonManagedReference; 
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "event")
@@ -26,20 +28,29 @@ public class Event {
     @Column(name = "end_date")
     private LocalDate endDate;
 
+    @Column(name = "start_time")
+    private LocalTime startTime;
+
+    @Column(name = "end_time")
+    private LocalTime endTime;
+
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "event_type_id", nullable = false)
     private EventType eventType;
 
-    @Column(name = "event_price", precision = 10, scale = 2)
-    private BigDecimal eventPrice;
+   @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_manager_id")
+    @JsonBackReference("manager-events") 
+    private EventManager eventManager;
 
-    @ManyToMany
-    @JoinTable(
-            name = "event_event_participant",
-            joinColumns = @JoinColumn(name = "event_id"),
-            inverseJoinColumns = @JoinColumn(name = "event_participant_id")
-    )
-    private Set<EventParticipant> participants = new HashSet<>();
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference 
+    private List<EventLecture> lectures = new ArrayList<>();
+    
+    // --- GETTERS E SETTERS ---
 
     public Integer getEventId() {
         return eventId;
@@ -81,6 +92,30 @@ public class Event {
         this.endDate = endDate;
     }
 
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public EventType getEventType() {
         return eventType;
     }
@@ -89,20 +124,19 @@ public class Event {
         this.eventType = eventType;
     }
 
-    public BigDecimal getEventPrice() {
-        return eventPrice;
+    public EventManager getEventManager() {
+        return eventManager;
     }
 
-    public void setEventPrice(BigDecimal eventPrice) {
-        this.eventPrice = eventPrice;
+    public void setEventManager(EventManager eventManager) {
+        this.eventManager = eventManager;
+    }
+    
+    public List<EventLecture> getLectures() {
+        return lectures;
     }
 
-    public Set<EventParticipant> getParticipants() {
-        return participants;
-    }
-
-    public void setParticipants(Set<EventParticipant> participants) {
-        this.participants = participants;
+    public void setLectures(List<EventLecture> lectures) {
+        this.lectures = lectures;
     }
 }
-

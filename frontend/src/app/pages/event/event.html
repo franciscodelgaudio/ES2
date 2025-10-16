@@ -1,0 +1,123 @@
+<main class="events-page-container">
+  <div class="header-container">
+    <div>
+      <h1 class="main-title">Próximos Eventos</h1>
+      <p class="main-subtitle">Fique por dentro de tudo que vai acontecer no mundo da tecnologia.</p>
+    </div>
+    <button *ngIf="isAdmin" class="admin-create-button" (click)="openCreateEventForm()">
+      + Cadastrar Evento
+    </button>
+  </div>
+
+  <div class="events-grid">
+    <div *ngFor="let event of events" class="event-card" (click)="showDetails(event)">
+      <img class="event-image" [src]="event.imageUrl" [alt]="event.nameEvent">
+      <div class="event-info">
+        <h3 class="event-title">{{ event.nameEvent }}</h3>
+        <p class="event-date">{{ event.startDate | date: 'dd/MM/yyyy' }}</p>
+        <p class="event-description">{{ event.description }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="selectedEvent" class="details-overlay" (click)="closeDetails()">
+    <div class="details-card" (click)="$event.stopPropagation()">
+      <button class="close-button" (click)="closeDetails()">×</button>
+      
+      <div class="details-header">
+        <h2>{{ selectedEvent.nameEvent }}</h2>
+        <button *ngIf="isAdmin" class="admin-create-button small" (click)="openCreateLectureForm()">
+          + Adicionar Palestra
+        </button>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <strong><i class="icon-calendar"></i> Data</strong>
+          <span>{{ selectedEvent.startDate | date: 'dd/MM' }} a {{ selectedEvent.endDate | date: 'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="info-item">
+          <strong><i class="icon-location"></i> Local</strong>
+          <span>{{ selectedEvent.address }}</span>
+        </div>
+      </div>
+
+      <h3 class="section-heading">Sobre o Evento</h3>
+      <p class="details-description">{{ selectedEvent.description }}</p>
+      
+      <app-event-lectures 
+        *ngIf="selectedEvent.lectures && selectedEvent.lectures.length > 0"
+        [lectures]="selectedEvent.lectures">
+      </app-event-lectures>
+      
+      <button class="cta-button" (click)="subscribeToMainEvent()">
+        Finalizar Inscrição no Evento
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="isCreatingEvent" class="form-overlay" (click)="closeCreateEventForm()">
+    <div class="form-card" (click)="$event.stopPropagation()">
+      <h3>Cadastrar Novo Evento</h3>
+      <form (ngSubmit)="saveNewEvent()">
+        <div class="form-group">
+          <label for="eventName">Nome do Evento</label>
+          <input type="text" id="eventName" [(ngModel)]="newEvent.nameEvent" name="eventName" required>
+        </div>
+        <div class="form-group">
+          <label for="eventAddress">Endereço</label>
+          <input type="text" id="eventAddress" [(ngModel)]="newEvent.address" name="eventAddress">
+        </div>
+        <div class="form-group-row">
+          <div class="form-group">
+            <label for="eventStartDate">Data de Início</label>
+            <input type="date" id="eventStartDate" [(ngModel)]="newEvent.startDate" name="eventStartDate">
+          </div>
+          <div class="form-group">
+            <label for="eventEndDate">Data de Fim</label>
+            <input type="date" id="eventEndDate" [(ngModel)]="newEvent.endDate" name="eventEndDate">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="eventDescription">Descrição</label>
+          <textarea id="eventDescription" [(ngModel)]="newEvent.description" name="eventDescription" rows="4"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="cancel-button" (click)="closeCreateEventForm()">Cancelar</button>
+          <button type="submit" class="cta-button">Salvar Evento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div *ngIf="isCreatingLecture" class="form-overlay" (click)="closeCreateLectureForm()">
+    <div class="form-card" (click)="$event.stopPropagation()">
+      <h3>Adicionar Nova Palestra</h3>
+      <form (ngSubmit)="saveNewLecture()">
+        <div class="form-group">
+          <label for="lectureName">Nome da Palestra</label>
+          <input type="text" id="lectureName" [(ngModel)]="newLecture.nameEventLecture" name="lectureName" required>
+        </div>
+        <div class="form-group">
+          <label for="lectureSpeaker">Palestrante</label>
+          <input type="text" id="lectureSpeaker" [(ngModel)]="newLecture.speaker" name="lectureSpeaker">
+        </div>
+        <div class="form-group-row">
+            <div class="form-group">
+              <label for="lectureStartTime">Hora de Início</label>
+              <input type="time" id="lectureStartTime" [(ngModel)]="newLecture.startTime" name="lectureStartTime">
+            </div>
+            <div class="form-group">
+              <label for="lectureEndTime">Hora de Fim</label>
+              <input type="time" id="lectureEndTime" [(ngModel)]="newLecture.endTime" name="lectureEndTime">
+            </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="cancel-button" (click)="closeCreateLectureForm()">Cancelar</button>
+          <button type="submit" class="cta-button">Salvar Palestra</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</main>

@@ -1,100 +1,116 @@
 package com.es2.equipe4.service;
 
-import com.es2.equipe4.dto.CreateActivityDTO;
 import com.es2.equipe4.dto.CreateEventDTO;
 import com.es2.equipe4.dto.CreateParticipantDTO;
-import com.es2.equipe4.model.Event;
-import com.es2.equipe4.model.EventActivity;
-import com.es2.equipe4.model.EventParticipant;
-import com.es2.equipe4.model.EventType;
-import com.es2.equipe4.repository.EventActivityRepository;
-import com.es2.equipe4.repository.EventParticipantRepository;
-import com.es2.equipe4.repository.EventRepository;
-import com.es2.equipe4.repository.EventTypeRepository;
+import com.es2.equipe4.model.*;
+import com.es2.equipe4.repository.*;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class EventService {
-    private final EventRepository eventRepo;
-    private final EventTypeRepository typeRepo;
-    private final EventActivityRepository activityRepo;
-    private final EventParticipantRepository participantRepo;
 
-    public EventService(EventRepository eventRepo, EventTypeRepository typeRepo,
-                        EventActivityRepository activityRepo, EventParticipantRepository participantRepo) {
-        this.eventRepo = eventRepo;
-        this.typeRepo = typeRepo;
-        this.activityRepo = activityRepo;
-        this.participantRepo = participantRepo;
+    private final EventRepository eventRepository;
+    private final EventTypeRepository eventTypeRepository;
+    private final EventLectureRepository lectureRepository; 
+    private final EventManagerRepository eventManagerRepository; 
+    private final EventParticipantRepository participantRepository;
+
+    public EventService(EventRepository eventRepository, EventTypeRepository eventTypeRepository,
+                        EventLectureRepository lectureRepository, EventManagerRepository eventManagerRepository,
+                        EventParticipantRepository participantRepository) {
+        this.eventRepository = eventRepository;
+        this.eventTypeRepository = eventTypeRepository;
+        this.lectureRepository = lectureRepository;
+        this.eventManagerRepository = eventManagerRepository;
+        this.participantRepository = participantRepository;
     }
 
     @Transactional
     public Event createEvent(CreateEventDTO dto) {
-        EventType type = typeRepo.findById(dto.eventTypeId())
-                .orElseThrow(() -> new IllegalArgumentException("event_type_id inválido"));
+        EventType eventType = eventTypeRepository.findById(dto.eventTypeId())
+                .orElseThrow(() -> new EntityNotFoundException("EventType not found with id: " + dto.eventTypeId()));
 
-        Event e = new Event();
-        e.setNameEvent(dto.nameEvent());
-        e.setAddress(dto.address());
-        e.setStartDate(dto.startDate());
-        e.setEndDate(dto.endDate());
-        e.setEventType(type);
-        e.setEventPrice(dto.eventPrice());
-        return eventRepo.save(e);
-    }
+        EventManager eventManager = eventManagerRepository.findById(dto.eventManagerId())
+                .orElseThrow(() -> new EntityNotFoundException("EventManager not found with id: " + dto.eventManagerId()));
 
-    @Transactional
-    public EventActivity createActivity(CreateActivityDTO dto) {
-        Event ev = eventRepo.findById(dto.eventId())
-                .orElseThrow(() -> new IllegalArgumentException("event_id inválido"));
+        Event event = new Event();
+        event.setNameEvent(dto.nameEvent());
+        event.setAddress(dto.address());
+        event.setStartDate(dto.startDate());
+        event.setEndDate(dto.endDate());
+        event.setStartTime(dto.startTime());
+        event.setEndTime(dto.endTime());
+        event.setDescription(dto.description());
+        event.setEventType(eventType);
+        event.setEventManager(eventManager);
 
-        EventActivity a = new EventActivity();
-        a.setName(dto.name());
-        a.setAddress(dto.address());
-        a.setQuantityVacancies(dto.quantityVacancies());
-        a.setStartDate(dto.startDate());
-        a.setEndDate(dto.endDate());
-        a.setEvent(ev);
-        a.setActivityPrice(dto.activityPrice());
-        return activityRepo.save(a);
+        if (dto.lectures() != null && !dto.lectures().isEmpty()) {
+            List<EventLecture> lectures = dto.lectures().stream().map(lectureDTO -> {
+                EventLecture lecture = new EventLecture();
+                lecture.setNameEventLecture(lectureDTO.name());
+                lecture.setAddress(lectureDTO.address());
+                lecture.setQuantityVacancies(lectureDTO.quantityVacancies());
+                lecture.setStartDate(lectureDTO.startDate());
+                lecture.setEndDate(lectureDTO.endDate());
+                lecture.setStartTime(lectureDTO.startTime());
+                lecture.setEndTime(lectureDTO.endTime());
+                lecture.setDescription(lectureDTO.description());
+                lecture.setSpeaker(lectureDTO.speaker());
+                lecture.setEvent(event); 
+                lecture.setEventManager(eventManager); 
+                return lecture;
+            }).collect(Collectors.toList());
+            event.setLectures(lectures);
+        }
+
+        return eventRepository.save(event);
     }
 
     @Transactional
     public EventParticipant registerParticipant(CreateParticipantDTO dto) {
-        if (participantRepo.existsByEmail(dto.email())) {
+        if (participantRepository.existsByEmail(dto.email())) {
             throw new IllegalArgumentException("E-mail já cadastrado");
         }
-        EventParticipant p = new EventParticipant();
-        p.setEmail(dto.email());
-        p.setName(dto.name());
-        p.setPassword(dto.password());
-        p.setAddress(dto.address());
-        p.setPhoneParticipant(dto.phoneParticipant());
-        p.setRoleParticipant(dto.roleParticipant());
-        return participantRepo.save(p);
+        EventParticipant participant = new EventParticipant();
+        participant.setName(dto.name());
+        participant.setEmail(dto.email());
+        participant.setPassword(dto.password());
+        participant.setAddress(dto.address());
+        participant.setPhoneParticipant(dto.phoneParticipant());
+        participant.setRoleParticipant(dto.roleParticipant());
+        return participantRepository.save(participant);
     }
 
     @Transactional
-    public void addParticipantToEvent(Integer eventId, Integer participantId) {
-        Event ev = eventRepo.findById(eventId).orElseThrow();
-        EventParticipant p = participantRepo.findById(participantId).orElseThrow();
-        ev.getParticipants().add(p);
-        eventRepo.save(ev);
-    }
+    public void addParticipantToLecture(Integer lectureId, Integer participantId) {
+        EventLecture lecture = lectureRepository.findById(lectureId)
+                .orElseThrow(() -> new EntityNotFoundException("Lecture not found with id: " + lectureId));
 
-    @Transactional
-    public void addParticipantToActivity(Integer activityId, Integer participantId) {
-        EventActivity ac = activityRepo.findById(activityId).orElseThrow();
-        EventParticipant p = participantRepo.findById(participantId).orElseThrow();
-
-        // valida vagas, se quiser:
-        if (ac.getQuantityVacancies() != null && ac.getParticipants().size() >= ac.getQuantityVacancies()) {
-            throw new IllegalStateException("Sem vagas para esta atividade");
+        EventParticipant participant = participantRepository.findById(participantId)
+                .orElseThrow(() -> new EntityNotFoundException("Participant not found with id: " + participantId));
+        
+        if (lecture.getQuantityVacancies() != null && lecture.getParticipants().size() >= lecture.getQuantityVacancies()) {
+            throw new IllegalStateException("Sem vagas para esta palestra");
         }
 
-        ac.getParticipants().add(p);
-        activityRepo.save(ac);
+        lecture.getParticipants().add(participant);
+        lectureRepository.save(lecture);
+    }
+
+    @Transactional
+    public void removeParticipantFromLecture(Integer lectureId, Integer participantId) {
+        EventLecture lecture = lectureRepository.findById(lectureId)
+                .orElseThrow(() -> new EntityNotFoundException("Lecture not found with id: " + lectureId));
+
+        EventParticipant participant = participantRepository.findById(participantId)
+                .orElseThrow(() -> new EntityNotFoundException("Participant not found with id: " + participantId));
+
+        lecture.getParticipants().remove(participant);
+        lectureRepository.save(lecture);
     }
 }
-
