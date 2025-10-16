@@ -2,11 +2,11 @@ package com.es2.equipe4.dto;
 
 import java.math.BigDecimal;
 
-public record CreateParticipantDTO(
+public record CreateManagerDTO(
         String email,
         String name,
         String password,
         String address,
-        String phoneParticipant,
-        String roleParticipant
+        String phoneManager,
+        String roleManager
 ) {}
