@@ -25,9 +25,23 @@ export interface MainEvent {
   address: string;
   startDate: string;
   endDate: string;
+  startTime: string;
+  endTime: string;
   description: string;
   imageUrl: string;
   lectures: EventLecture[];
+  eventType: EventType;
+  eventManager: EventManager;
+}
+
+export interface EventType {
+  eventTypeId: number;
+  nameEventType: string;
+}
+
+export interface EventManager {
+  eventManagerId: number;
+  name: string;
 }
 
 @Component({
@@ -51,6 +65,9 @@ export class Event implements OnInit {
   newEvent: any = {};
   newLecture: any = {};
 
+  eventTypes: EventType[] = [];
+  eventManagers: EventManager[] = [];
+
   private apiService = inject(ApiService);
 
   ngOnInit(): void {
@@ -65,6 +82,21 @@ export class Event implements OnInit {
     });
 
     this.loadEvents();
+    if (this.isAdmin) {
+      this.loadFormData();
+    }
+  }
+
+  loadFormData(): void {
+    this.apiService.getEventTypes().subscribe({
+      next: (data) => this.eventTypes = data,
+      error: (err) => console.error('Falha ao carregar tipos de evento:', err)
+    });
+
+    this.apiService.getEventManagers().subscribe({
+      next: (data) => this.eventManagers = data,
+      error: (err) => console.error('Falha ao carregar gestores de evento:', err)
+    });
   }
 
   private updateIsAdmin() {
@@ -94,11 +126,22 @@ export class Event implements OnInit {
   }
 
   subscribeToMainEvent() {
+    // Lógica de inscrição do utilizador...
   }
 
   openCreateEventForm() {
     this.isCreatingEvent = true;
-    this.newEvent = { nameEvent: '', address: '', startDate: '', endDate: '' };
+    this.newEvent = {
+      nameEvent: '',
+      address: '',
+      startDate: '',
+      endDate: '',
+      startTime: '',
+      endTime: '',
+      description: '',
+      eventTypeId: null, 
+      eventManagerId: null 
+    };
   }
 
   closeCreateEventForm() {
@@ -106,14 +149,39 @@ export class Event implements OnInit {
   }
 
   saveNewEvent() {
-    console.log('Salvando novo evento:', this.newEvent);
-    alert('Novo evento salvo!');
-    this.closeCreateEventForm();
+    const eventPayload = {
+      ...this.newEvent,
+      lectures: [] 
+    };
+
+    this.apiService.createEvent(eventPayload).subscribe({
+      next: (newEvent) => {
+        console.log('Evento criado com sucesso:', newEvent);
+        alert('Evento cadastrado com sucesso!'); 
+        this.loadEvents(); 
+        this.closeCreateEventForm();
+      },
+      error: (err) => {
+        console.error('Erro ao criar evento:', err);
+        alert('Falha ao criar o evento.');
+      }
+    });
   }
 
   openCreateLectureForm() {
     this.isCreatingLecture = true;
-    this.newLecture = { nameEventLecture: '', speaker: '', startTime: '', endTime: '' };
+    this.newLecture = {
+      nameEventLecture: '',
+      speaker: '',
+      address: '',
+      quantityVacancies: 0,
+      startDate: '',
+      endDate: '',
+      startTime: '',
+      endTime: '',
+      description: '',
+      eventManagerId: null 
+    };
   }
 
   closeCreateLectureForm() {
@@ -123,9 +191,20 @@ export class Event implements OnInit {
   saveNewLecture() {
     if (this.selectedEvent) {
       const eventId = this.selectedEvent.eventId;
-      console.log(`Salvando nova palestra para o evento ${eventId}:`, this.newLecture);
-      alert('Nova palestra salva! (Verifique a consola)');
-      this.closeCreateLectureForm();
+      
+      this.apiService.addLectureToEvent(eventId, this.newLecture).subscribe({
+        next: (newLecture) => {
+          console.log(`Palestra adicionada ao evento ${eventId}:`, newLecture);
+          alert('Palestra adicionada com sucesso!'); 
+          this.loadEvents();
+          this.closeCreateLectureForm();
+          this.closeDetails();
+        },
+        error: (err) => {
+          console.error('Erro ao adicionar palestra:', err);
+          alert('Falha ao adicionar a palestra.');
+        }
+      });
     }
   }
 }

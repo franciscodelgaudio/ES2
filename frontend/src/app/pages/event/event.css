@@ -205,7 +205,9 @@
   backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start; 
+  padding: 4rem 2rem;       
+  overflow-y: auto;        
   z-index: 2000;
 }
 
