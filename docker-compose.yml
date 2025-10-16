@@ -42,7 +42,7 @@ services:
       dockerfile: Dockerfile
     container_name: es2-api
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-es2}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/es2?options=-c%20TimeZone=America/Sao_Paulo
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-equipe4}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-1234}
       SPRING_JPA_PROPERTIES_HIBERNATE_JDBC_TIME_ZONE: UTC
