@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { Auth } from '../../../core/services/auth';
+
 
 @Component({
   selector: 'app-header',
@@ -10,5 +12,5 @@ import { RouterLink } from '@angular/router';
   styleUrl: './header.css'
 })
 export class Header {
-
+  constructor(public auth: Auth) { }
 }
