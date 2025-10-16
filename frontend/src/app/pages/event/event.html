@@ -23,7 +23,6 @@
   <div *ngIf="selectedEvent" class="details-overlay" (click)="closeDetails()">
     <div class="details-card" (click)="$event.stopPropagation()">
       <button class="close-button" (click)="closeDetails()">×</button>
-      
       <div class="details-header">
         <h2>{{ selectedEvent.nameEvent }}</h2>
         <button *ngIf="isAdmin" class="admin-create-button small" (click)="openCreateLectureForm()">
@@ -53,6 +52,7 @@
       <button class="cta-button" (click)="subscribeToMainEvent()">
         Finalizar Inscrição no Evento
       </button>
+
     </div>
   </div>
 
@@ -62,25 +62,51 @@
       <form (ngSubmit)="saveNewEvent()">
         <div class="form-group">
           <label for="eventName">Nome do Evento</label>
-          <input type="text" id="eventName" [(ngModel)]="newEvent.nameEvent" name="eventName" required>
+          <input type="text" id="eventName" [(ngModel)]="newEvent.nameEvent" name="nameEvent" required>
         </div>
         <div class="form-group">
           <label for="eventAddress">Endereço</label>
-          <input type="text" id="eventAddress" [(ngModel)]="newEvent.address" name="eventAddress">
+          <input type="text" id="eventAddress" [(ngModel)]="newEvent.address" name="address">
         </div>
         <div class="form-group-row">
           <div class="form-group">
             <label for="eventStartDate">Data de Início</label>
-            <input type="date" id="eventStartDate" [(ngModel)]="newEvent.startDate" name="eventStartDate">
+            <input type="date" id="eventStartDate" [(ngModel)]="newEvent.startDate" name="startDate">
           </div>
           <div class="form-group">
             <label for="eventEndDate">Data de Fim</label>
-            <input type="date" id="eventEndDate" [(ngModel)]="newEvent.endDate" name="eventEndDate">
+            <input type="date" id="eventEndDate" [(ngModel)]="newEvent.endDate" name="endDate">
+          </div>
+        </div>
+        <div class="form-group-row">
+          <div class="form-group">
+            <label for="eventStartTime">Hora de Início</label>
+            <input type="time" id="eventStartTime" [(ngModel)]="newEvent.startTime" name="startTime">
+          </div>
+          <div class="form-group">
+            <label for="eventEndTime">Hora de Fim</label>
+            <input type="time" id="eventEndTime" [(ngModel)]="newEvent.endTime" name="endTime">
           </div>
         </div>
         <div class="form-group">
           <label for="eventDescription">Descrição</label>
-          <textarea id="eventDescription" [(ngModel)]="newEvent.description" name="eventDescription" rows="4"></textarea>
+          <textarea id="eventDescription" [(ngModel)]="newEvent.description" name="description" rows="3"></textarea>
+        </div>
+        <div class="form-group-row">
+          <div class="form-group">
+            <label for="eventType">Tipo de Evento</label>
+            <select id="eventType" [(ngModel)]="newEvent.eventTypeId" name="eventTypeId" required>
+              <option [ngValue]="null" disabled>Selecione um tipo</option>
+              <option *ngFor="let type of eventTypes" [value]="type.eventTypeId">{{ type.nameEventType }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="eventManager">Gerente do Evento</label>
+            <select id="eventManager" [(ngModel)]="newEvent.eventManagerId" name="eventManagerId" required>
+              <option [ngValue]="null" disabled>Selecione um gerente</option>
+              <option *ngFor="let manager of eventManagers" [value]="manager.eventManagerId">{{ manager.name }}</option>
+            </select>
+          </div>
         </div>
         <div class="form-actions">
           <button type="button" class="cancel-button" (click)="closeCreateEventForm()">Cancelar</button>
@@ -92,25 +118,56 @@
 
   <div *ngIf="isCreatingLecture" class="form-overlay" (click)="closeCreateLectureForm()">
     <div class="form-card" (click)="$event.stopPropagation()">
-      <h3>Adicionar Nova Palestra</h3>
+      <h3>Cadastrar Nova Palestra</h3>
       <form (ngSubmit)="saveNewLecture()">
         <div class="form-group">
           <label for="lectureName">Nome da Palestra</label>
-          <input type="text" id="lectureName" [(ngModel)]="newLecture.nameEventLecture" name="lectureName" required>
+          <input type="text" id="lectureName" [(ngModel)]="newLecture.nameEventLecture" name="nameEventLecture" required>
         </div>
         <div class="form-group">
           <label for="lectureSpeaker">Palestrante</label>
-          <input type="text" id="lectureSpeaker" [(ngModel)]="newLecture.speaker" name="lectureSpeaker">
+          <input type="text" id="lectureSpeaker" [(ngModel)]="newLecture.speaker" name="speaker" required>
+        </div>
+        <div class="form-group">
+          <label for="lectureAddress">Endereço</label>
+          <input type="text" id="lectureAddress" [(ngModel)]="newLecture.address" name="address">
         </div>
         <div class="form-group-row">
             <div class="form-group">
-              <label for="lectureStartTime">Hora de Início</label>
-              <input type="time" id="lectureStartTime" [(ngModel)]="newLecture.startTime" name="lectureStartTime">
+              <label for="lectureStartDate">Data de Início</label>
+              <input type="date" id="lectureStartDate" [(ngModel)]="newLecture.startDate" name="startDate">
             </div>
             <div class="form-group">
-              <label for="lectureEndTime">Hora de Fim</label>
-              <input type="time" id="lectureEndTime" [(ngModel)]="newLecture.endTime" name="lectureEndTime">
+              <label for="lectureEndDate">Data de Fim</label>
+              <input type="date" id="lectureEndDate" [(ngModel)]="newLecture.endDate" name="endDate">
             </div>
+        </div>
+        <div class="form-group-row">
+          <div class="form-group">
+            <label for="lectureStartTime">Hora de Início</label>
+            <input type="time" id="lectureStartTime" [(ngModel)]="newLecture.startTime" name="startTime">
+          </div>
+          <div class="form-group">
+            <label for="lectureEndTime">Hora de Fim</label>
+            <input type="time" id="lectureEndTime" [(ngModel)]="newLecture.endTime" name="endTime">
+          </div>
+        </div>
+        <div class="form-group-row">
+          <div class="form-group">
+            <label for="lectureVacancies">Nº de Vagas</label>
+            <input type="number" id="lectureVacancies" [(ngModel)]="newLecture.quantityVacancies" name="quantityVacancies">
+          </div>
+          <div class="form-group">
+            <label for="lectureManager">Gerente Responsável</label>
+            <select id="lectureManager" [(ngModel)]="newLecture.eventManagerId" name="eventManagerId" required>
+              <option [ngValue]="null" disabled>Selecione um gerente</option>
+              <option *ngFor="let manager of eventManagers" [value]="manager.eventManagerId">{{ manager.name }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="lectureDescription">Descrição</label>
+          <textarea id="lectureDescription" [(ngModel)]="newLecture.description" name="description" rows="3"></textarea>
         </div>
         <div class="form-actions">
           <button type="button" class="cancel-button" (click)="closeCreateLectureForm()">Cancelar</button>

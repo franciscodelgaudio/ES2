@@ -1,15 +1,10 @@
 package com.es2.equipe4.controller;
 
 import com.es2.equipe4.dto.CreateEventDTO;
+import com.es2.equipe4.dto.CreateLectureDTO;
 import com.es2.equipe4.dto.CreateParticipantDTO;
-import com.es2.equipe4.model.Event;
-import com.es2.equipe4.model.EventLecture;
-import com.es2.equipe4.model.EventParticipant;
-import com.es2.equipe4.model.EventType;
-import com.es2.equipe4.repository.EventLectureRepository;
-import com.es2.equipe4.repository.EventParticipantRepository;
-import com.es2.equipe4.repository.EventRepository;
-import com.es2.equipe4.repository.EventTypeRepository;
+import com.es2.equipe4.model.*;
+import com.es2.equipe4.repository.*;
 import com.es2.equipe4.service.EventService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,15 +21,17 @@ public class EventController {
     private final EventTypeRepository typeRepo;
     private final EventLectureRepository lectureRepo;
     private final EventParticipantRepository participantRepo;
+    private final EventManagerRepository managerRepo; 
 
     public EventController(EventService service, EventRepository eventRepo,
                            EventTypeRepository typeRepo, EventLectureRepository lectureRepo,
-                           EventParticipantRepository participantRepo) {
+                           EventParticipantRepository participantRepo, EventManagerRepository managerRepo) { 
         this.service = service;
         this.eventRepo = eventRepo;
         this.typeRepo = typeRepo;
         this.lectureRepo = lectureRepo;
         this.participantRepo = participantRepo;
+        this.managerRepo = managerRepo; // Atribuído
     }
 
 
@@ -43,12 +40,15 @@ public class EventController {
         return typeRepo.findAll();
     }
 
+    @GetMapping("/event-managers")
+    public List<EventManager> listManagers() {
+        return managerRepo.findAll();
+    }
 
     @PostMapping("/event-types")
     public EventType createType(@RequestBody EventType t) {
         return typeRepo.save(t);
     }
-
 
     @GetMapping("/events")
     public List<Event> listEvents() {
@@ -60,9 +60,13 @@ public class EventController {
         return service.createEvent(dto);
     }
 
+    @PostMapping("/events/{eventId}/lectures")
+    public EventLecture createLectureForEvent(@PathVariable Integer eventId, @RequestBody CreateLectureDTO dto) {
+        return service.addLectureToEvent(eventId, dto);
+    }
+
     @GetMapping("/events/{id}")
     public ResponseEntity<Event> getEvent(@PathVariable Integer id) {
-        
         return eventRepo.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -73,13 +77,11 @@ public class EventController {
         return lectureRepo.findAll();
     }
 
-
     @PostMapping("/lectures/{lectureId}/participants/{participantId}")
     public ResponseEntity<Void> enrollInLecture(@PathVariable Integer lectureId, @PathVariable Integer participantId) {
         service.addParticipantToLecture(lectureId, participantId);
         return ResponseEntity.noContent().build();
     }
-
 
     @DeleteMapping("/lectures/{lectureId}/participants/{participantId}")
     public ResponseEntity<Void> unenrollFromLecture(@PathVariable Integer lectureId, @PathVariable Integer participantId) {
@@ -87,12 +89,10 @@ public class EventController {
         return ResponseEntity.noContent().build();
     }
 
-
     @GetMapping("/participants")
     public List<EventParticipant> listParticipants() {
         return participantRepo.findAll();
     }
-
 
     @PostMapping("/participants")
     public EventParticipant register(@RequestBody CreateParticipantDTO dto) {

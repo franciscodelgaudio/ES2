@@ -1,6 +1,7 @@
 package com.es2.equipe4.service;
 
 import com.es2.equipe4.dto.CreateEventDTO;
+import com.es2.equipe4.dto.CreateLectureDTO;
 import com.es2.equipe4.dto.CreateParticipantDTO;
 import com.es2.equipe4.model.*;
 import com.es2.equipe4.repository.*;
@@ -16,8 +17,8 @@ public class EventService {
 
     private final EventRepository eventRepository;
     private final EventTypeRepository eventTypeRepository;
-    private final EventLectureRepository lectureRepository; 
-    private final EventManagerRepository eventManagerRepository; 
+    private final EventLectureRepository lectureRepository;
+    private final EventManagerRepository eventManagerRepository;
     private final EventParticipantRepository participantRepository;
 
     public EventService(EventRepository eventRepository, EventTypeRepository eventTypeRepository,
@@ -52,23 +53,39 @@ public class EventService {
         if (dto.lectures() != null && !dto.lectures().isEmpty()) {
             List<EventLecture> lectures = dto.lectures().stream().map(lectureDTO -> {
                 EventLecture lecture = new EventLecture();
-                lecture.setNameEventLecture(lectureDTO.name());
-                lecture.setAddress(lectureDTO.address());
-                lecture.setQuantityVacancies(lectureDTO.quantityVacancies());
-                lecture.setStartDate(lectureDTO.startDate());
-                lecture.setEndDate(lectureDTO.endDate());
-                lecture.setStartTime(lectureDTO.startTime());
-                lecture.setEndTime(lectureDTO.endTime());
-                lecture.setDescription(lectureDTO.description());
-                lecture.setSpeaker(lectureDTO.speaker());
-                lecture.setEvent(event); 
-                lecture.setEventManager(eventManager); 
+                lecture.setNameEventLecture(lectureDTO.nameEventLecture());
+                lecture.setEvent(event);
+                lecture.setEventManager(eventManager);
                 return lecture;
             }).collect(Collectors.toList());
             event.setLectures(lectures);
         }
 
         return eventRepository.save(event);
+    }
+    
+    @Transactional
+    public EventLecture addLectureToEvent(Integer eventId, CreateLectureDTO lectureDTO) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + eventId));
+
+        EventManager eventManager = eventManagerRepository.findById(lectureDTO.eventManagerId())
+                .orElseThrow(() -> new EntityNotFoundException("EventManager not found with id: " + lectureDTO.eventManagerId()));
+
+        EventLecture lecture = new EventLecture();
+        lecture.setNameEventLecture(lectureDTO.nameEventLecture());
+        lecture.setSpeaker(lectureDTO.speaker());
+        lecture.setAddress(lectureDTO.address());
+        lecture.setQuantityVacancies(lectureDTO.quantityVacancies());
+        lecture.setStartDate(lectureDTO.startDate());
+        lecture.setEndDate(lectureDTO.endDate());
+        lecture.setStartTime(lectureDTO.startTime());
+        lecture.setEndTime(lectureDTO.endTime());
+        lecture.setDescription(lectureDTO.description());
+        lecture.setEvent(event);
+        lecture.setEventManager(eventManager);
+
+        return lectureRepository.save(lecture);
     }
 
     @Transactional
