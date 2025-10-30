@@ -1,62 +1,50 @@
-import { Injectable, inject } from '@angular/core';
-import { OAuthService } from 'angular-oauth2-oidc';
-import { authCodeFlowConfig } from '../../oauth.config';
+// src/app/core/auth/auth.service.ts (ou onde você mantiver seu Auth)
+import { Injectable } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class Auth {
-  private oauth = inject(OAuthService);
+  // Guarde estado simples em localStorage para persistir no refresh
+  private readonly KEY = 'demo_auth';
 
   login(loginHint?: string) {
-    if (loginHint) {
-      (this.oauth as any).initCodeFlow({ customQueryParams: { login_hint: loginHint } });
-    } else {
-      (this.oauth as any).initCodeFlow();
-    }
+    // Sem OAuth: apenas marca como logado (opcionalmente salve um "perfil fake")
+    localStorage.setItem(this.KEY, JSON.stringify({
+      loggedIn: true,
+      profile: { name: loginHint ?? 'Usuário', email: '' },
+      roles: [] as string[], // ajuste se quiser simular roles
+    }));
   }
 
   logout() {
-    this.oauth.logOut(); // opcional: this.oauth.logOut({ redirectUri: window.location.origin });
+    localStorage.removeItem(this.KEY);
   }
 
   isLoggedIn(): boolean {
-    return this.oauth.hasValidAccessToken();
-  }
-
-  get profile() {
-    return this.oauth.getIdentityClaims();
-  }
-
-/** Decodifica o Access Token para ler roles */
-  private getAccessTokenClaims(): any | null {
-    const tok = this.oauth.getAccessToken();
-    if (!tok) return null;
-    const parts = tok.split('.');
-    if (parts.length !== 3) return null;
     try {
-      return JSON.parse(atob(parts[1]));
+      const data = JSON.parse(localStorage.getItem(this.KEY) ?? 'null');
+      return !!data?.loggedIn;
+    } catch {
+      return false;
+    }
+  }
+
+  get profile(): any | null {
+    try {
+      const data = JSON.parse(localStorage.getItem(this.KEY) ?? 'null');
+      return data?.profile ?? null;
     } catch {
       return null;
     }
   }
 
-  /** Checa role no access token (realm roles e client roles) */
+  /** Mantém a assinatura, sempre disponível sem OAuth */
   hasRole(role: string): boolean {
-    const claims = this.getAccessTokenClaims();
-    const clientId = (authCodeFlowConfig as any).clientId as string; // <- usa o mesmo clientId que você configurou no Keycloak
-
-    // Logs para depuração no NAVEGADOR (F12)
-    console.log('[AUTH] access token claims:', claims);
-    console.log('[AUTH] ID claims:', this.oauth.getIdentityClaims());
-    console.log('[AUTH] clientId usado para resource_access:', clientId);
-
-    if (!claims) return false;
-
-    const realmRoles: string[] = claims?.realm_access?.roles ?? [];
-    const clientRoles: string[] = claims?.resource_access?.[clientId]?.roles ?? [];
-
-    console.log('[AUTH] realm roles:', realmRoles);
-    console.log('[AUTH] client roles:', clientRoles);
-
-    return realmRoles.includes(role) || clientRoles.includes(role);
+    try {
+      const data = JSON.parse(localStorage.getItem(this.KEY) ?? 'null');
+      const roles: string[] = data?.roles ?? [];
+      return roles.includes(role);
+    } catch {
+      return false;
+    }
   }
 }

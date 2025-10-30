@@ -20,10 +20,6 @@ export class Login implements OnInit {
   loginForm!: FormGroup;
 
   ngOnInit(): void {
-    if (this.auth.isLoggedIn()) {
-      this.router.navigateByUrl('/home'); // ou '/'
-      return;
-    }
     this.loginForm = new FormGroup({
       email: new FormControl('', [Validators.required, Validators.email]),
       password: new FormControl('', Validators.required) // mantemos só pela UI
@@ -37,11 +33,9 @@ export class Login implements OnInit {
       return;
     }
     const email = this.loginForm.value.email as string;
-    // Em vez de “simular login”, redireciona para o Keycloak com o login_hint:
     this.auth.login(email);
   }
 
-  // opcional: botão "Entrar com Keycloak" sem validar campos
   loginDirect() {
     this.auth.login();
   }

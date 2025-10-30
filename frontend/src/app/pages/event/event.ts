@@ -3,8 +3,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventLectures } from '../event-lectures/event-lectures';
 import { ApiService } from '../../core/services/api';
-import { Auth } from '../../core/services/auth';
-import { OAuthService, OAuthEvent } from 'angular-oauth2-oidc';
+import { Auth } from '../../core/services/auth'; // <- seu stub sem OAuth
 
 export interface EventLecture {
   eventLectureId: number;
@@ -51,7 +50,6 @@ export interface EventManager {
   templateUrl: './event.html',
   styleUrls: ['./event.css']
 })
-
 export class Event implements OnInit {
   selectedEvent: MainEvent | null = null;
   events: MainEvent[] = [];
@@ -60,12 +58,12 @@ export class Event implements OnInit {
 
   constructor(
     private auth: Auth,
-    private oauth: OAuthService,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef
-  ) { }
-  isCreatingEvent: boolean = false;
-  isCreatingLecture: boolean = false;
+  ) {}
+
+  isCreatingEvent = false;
+  isCreatingLecture = false;
 
   newEvent: any = {};
   newLecture: any = {};
@@ -78,41 +76,33 @@ export class Event implements OnInit {
   ngOnInit(): void {
     this.updateIsAdmin();
 
-    // 1ª tentativa (útil se a API permitir público ou o token já existir)
+    // Carrega eventos sempre (sua API agora pode ser pública ou
+    // controlada no backend sem OAuth)
     this.loadEvents();
 
-    // Quando o token chegar ou renovar, recarregue
-    this.oauth.events.subscribe((e: OAuthEvent) => {
-      if (e.type === 'token_received' || e.type === 'token_refreshed') {
-        this.updateIsAdmin();
-        this.loadEvents();
-        if (this.isAdmin) {
-          this.loadFormData();
-        }
-      }
-    });
-
-    // Se já houver token válido no refresh da página, não espere o evento
-    if ((this.oauth as any).hasValidAccessToken?.()) {
-      if (this.isAdmin) this.loadFormData();
+    // Se for admin (segundo seu stub), carrega dados do formulário
+    if (this.isAdmin) {
+      this.loadFormData();
     }
+  }
+
+  private updateIsAdmin() {
+    // Você pode também combinar com isLoggedIn() se quiser:
+    // this.isAdmin = this.auth.isLoggedIn() && this.auth.hasRole('admin');
+    this.isAdmin = this.auth.hasRole('admin');
+    console.log('[EVENT] isAdmin =', this.isAdmin);
   }
 
   loadFormData(): void {
     this.apiService.getEventTypes().subscribe({
-      next: (data) => this.eventTypes = data,
+      next: (data) => (this.eventTypes = data),
       error: (err) => console.error('Falha ao carregar tipos de evento:', err)
     });
 
     this.apiService.getEventManagers().subscribe({
-      next: (data) => this.eventManagers = data,
+      next: (data) => (this.eventManagers = data),
       error: (err) => console.error('Falha ao carregar gestores de evento:', err)
     });
-  }
-
-  private updateIsAdmin() {
-    this.isAdmin = this.auth.hasRole('admin');
-    console.log('[EVENT] isAdmin =', this.isAdmin);
   }
 
   loadEvents(): void {
@@ -124,7 +114,7 @@ export class Event implements OnInit {
             imageUrl: ev.imageUrl ?? 'assets/images/event.jpg',
             lectures: (ev.lectures ?? []).map(l => ({ ...l, isSubscribed: false }))
           }));
-          this.cdr.detectChanges(); // garante render imediato
+          this.cdr.detectChanges();
         });
       },
       error: (err) => console.error('Falha ao carregar eventos da API:', err)
@@ -163,10 +153,7 @@ export class Event implements OnInit {
   }
 
   saveNewEvent() {
-    const eventPayload = {
-      ...this.newEvent,
-      lectures: []
-    };
+    const eventPayload = { ...this.newEvent, lectures: [] };
 
     this.apiService.createEvent(eventPayload).subscribe({
       next: (newEvent) => {
