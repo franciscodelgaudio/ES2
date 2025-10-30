@@ -2,14 +2,11 @@ name: CI/CD
 
 on:
   push:
-    branches: ["master"]   # dispara só quando der push na master
+    branches: ["master"]
   pull_request:
-  workflow_dispatch:       # botão "Run workflow" manual
+  workflow_dispatch:
 
 jobs:
-  # =======================
-  # CI no runner do GitHub
-  # =======================
   backend:
     name: Backend (Java + Maven)
     runs-on: ubuntu-latest
@@ -86,9 +83,6 @@ jobs:
           push: false
           tags: es2-web:ci
 
-  # =======================
-  # CD no runner self-hosted
-  # =======================
   deploy:
     name: CD (Deploy via Docker Compose)
     runs-on: self-hosted
