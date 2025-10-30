@@ -1,0 +1,19 @@
+{
+  "realm": "es2",
+  "enabled": true,
+  "registrationAllowed": true,
+  "internationalizationEnabled": true,
+  "supportedLocales": ["pt-BR"],
+  "defaultLocale": "pt-BR",
+  "loginTheme": "inovatech",
+  "clients": [
+    {
+      "clientId": "spa-es2",
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "redirectUris": ["http://localhost/*"],
+      "webOrigins": ["http://localhost"]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/styles.css"],
+  "sourcesContent": ["body {\n  margin: 0;\n  font-family: 'Poppins', sans-serif;\n  background-color: #44436d;\n  color: white;\n}\n\n\n* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box;\n}\n\n\nbody {\n  overflow-x: hidden;\n}"],
+  "mappings": ";AAAA;AACE,UAAQ;AACR,eAAa,SAAS,EAAE;AACxB,oBAAkB;AAClB,SAAO;AACT;AAGA;AACE,UAAQ;AACR,WAAS;AACT,cAAY;AACd;AAGA;AACE,cAAY;AACd;",
+  "names": []
+}

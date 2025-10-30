@@ -6,14 +6,35 @@ services:
       POSTGRES_DB: es2
       POSTGRES_USER: equipe4
       POSTGRES_PASSWORD: 1234
-    ports: ["5432:5432"]
+      # Opcional: timezone do container do DB (não resolve o erro do driver)
+      # TZ: UTC
+    ports: ["15432:5432"]
     volumes:
       - es2_data:/var/lib/postgresql
     healthcheck:
+      # Dica: se quiser evitar a substituição por variáveis do host, fixa usuário/db
       test: ["CMD-SHELL", "pg_isready -U equipe4 -d es2"]
       interval: 5s
       timeout: 3s
       retries: 20
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.4.0
+    container_name: es2-keycloak
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_PROXY: edge
+      KC_SPI_THEME_CACHE_THEMES: "false"
+      KC_SPI_THEME_CACHE_TEMPLATES: "false"
+      # Opcional: só pra logs do container
+      # TZ: America/Sao_Paulo
+    ports: ["8080:8080"]
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+      - ./keycloak/realm-es2.json:/opt/keycloak/data/import/es2.json:ro
+      - ./keycloak/theme:/opt/keycloak/themes:ro
 
   api:
     build:
@@ -32,13 +53,16 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      keycloak:
+        condition: service_started
 
   web:
     build:
       context: ./frontend
     container_name: es2-web
     depends_on: [api]
-    ports: ["4200:4200"]
+    ports: ["80:80"]
 
 volumes:
   es2_data:
+  keycloak_data:
