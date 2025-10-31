@@ -91,7 +91,7 @@ jobs:
   # =======================
   deploy:
     name: CD (Deploy via Docker Compose)
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: [docker-build]
     steps:
       - name: Deploy app
