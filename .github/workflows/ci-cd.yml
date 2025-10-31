@@ -87,14 +87,15 @@ jobs:
           tags: es2-web:ci
 
   # =======================
-  # CD no runner self-hosted
+  # CD no runner do GitHub
   # =======================
   deploy:
     name: CD (Deploy via Docker Compose)
     runs-on: ubuntu-latest
     needs: [docker-build]
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Deploy app
-        run: |
-          cd /home/delgaudio/Documentos/ES2
-          docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
+        run: docker compose -f docker-compose.yml up -d --build --remove-orphans
