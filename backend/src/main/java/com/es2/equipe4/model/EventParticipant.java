@@ -10,13 +10,13 @@ public class EventParticipant {
     @Column(name = "event_participant_id")
     private Integer eventParticipantId;
 
-    @Column(name = "email", nullable = false, length = 100, unique = true)
+    @Column(name = "email", nullable = false, length = 255, unique = true)
     private String email;
 
-    @Column(name = "name", length = 100)
+    @Column(name = "name", length = 255)
     private String name;
 
-    @Column(name = "password", length = 100)
+    @Column(name = "password", length = 255)
     private String password;
 
     @Column(name = "address", length = 200)

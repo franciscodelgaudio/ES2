@@ -12,7 +12,7 @@ public class EventType {
     private Integer eventTypeId;
 
     
-    @Column(name = "name", nullable = false, length = 100)
+    @Column(name = "name_event_type", nullable = false, length = 100)
     private String nameEventType;
 
     public Integer getEventTypeId() {

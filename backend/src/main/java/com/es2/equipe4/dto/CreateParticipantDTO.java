@@ -1,7 +1,5 @@
 package com.es2.equipe4.dto;
 
-import java.math.BigDecimal;
-
 public record CreateParticipantDTO(
         String email,
         String name,
