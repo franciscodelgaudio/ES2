@@ -6,6 +6,8 @@ services:
       POSTGRES_DB: es2
       POSTGRES_USER: equipe4
       POSTGRES_PASSWORD: 1234
+      # Evita erro do initdb quando o volume tem 'lost+found' ou arquivos
+      PGDATA: /var/lib/postgresql/data/pgdata
     ports: ["5432:5432"]
     volumes:
       - es2_data:/var/lib/postgresql/data
