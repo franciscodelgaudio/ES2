@@ -16,7 +16,7 @@ export class ApiService {
   private http = inject(HttpClient);
 
   // Base da API apontando para o túnel ngrok
-  private readonly apiUrl = 'https://michiko-overeducative-unequilaterally.ngrok-free.dev/api';
+  private readonly apiUrl = 'https://michiko-overeducative-unequilaterally.ngrok-free.dev';
 
   registerParticipant(userData: any): Observable<HttpResponse<ParticipantDTO>> {
     // observe: 'response' para termos status + body
