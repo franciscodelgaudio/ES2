@@ -15,8 +15,8 @@ interface ParticipantDTO {
 export class ApiService {
   private http = inject(HttpClient);
 
-  // Base da API apontando para o túnel ngrok
-  private readonly apiUrl = 'https://michiko-overeducative-unequilaterally.ngrok-free.dev';
+  // Base da API apontando para o túnel ngrok (com prefixo /api)
+  private readonly apiUrl = 'https://michiko-overeducative-unequilaterally.ngrok-free.dev/api';
 
   registerParticipant(userData: any): Observable<HttpResponse<ParticipantDTO>> {
     // observe: 'response' para termos status + body
