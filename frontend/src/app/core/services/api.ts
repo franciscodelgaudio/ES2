@@ -15,8 +15,8 @@ interface ParticipantDTO {
 export class ApiService {
   private http = inject(HttpClient);
 
-  // Em dev, considere trocar para apenas '/api' e usar proxy do Angular
-  private readonly apiUrl = 'http://localhost:8081/api';
+  // Base da API apontando para o túnel ngrok
+  private readonly apiUrl = 'https://michiko-overeducative-unequilaterally.ngrok-free.dev/api';
 
   registerParticipant(userData: any): Observable<HttpResponse<ParticipantDTO>> {
     // observe: 'response' para termos status + body
